@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Navigation } from "@/components/Navigation";
 import { ServiceCard } from "@/components/ServiceCard";
 import { ContactForm } from "@/components/ContactForm";
@@ -10,11 +11,21 @@ import {
   Server, 
   ShieldCheck, 
   CheckCircle2, 
-  ArrowRight
+  ArrowRight,
+  LayoutList
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Link } from "wouter";
 
 export default function Home() {
+  useEffect(() => {
+    const hash = window.location.hash.slice(1);
+    if (hash) {
+      const el = document.getElementById(hash);
+      if (el) el.scrollIntoView({ behavior: "smooth" });
+    }
+  }, []);
+
   const scrollToContact = () => {
     document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" });
   };
@@ -193,6 +204,36 @@ export default function Home() {
               />
             ))}
           </div>
+
+          {/* Featured solution: OpsQMS */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="mt-16 max-w-4xl mx-auto"
+          >
+            <Link href="/opsqms">
+              <a className="block group p-8 md:p-10 rounded-2xl bg-white border-2 border-primary/20 shadow-lg hover:shadow-xl hover:border-primary/40 transition-all duration-300 text-left">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-6">
+                  <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0 group-hover:bg-primary/20 transition-colors">
+                    <LayoutList className="w-7 h-7 text-primary" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-xl md:text-2xl font-bold text-secondary group-hover:text-primary transition-colors mb-2">
+                      Operations Queue Management System (OpsQMS)
+                    </h3>
+                    <p className="text-muted-foreground leading-relaxed mb-4">
+                    A structured operations management solution that replaces fragmented processing methods with automated workflows, defined ownership, and full audit visibility—reducing operational risk while improving turnaround times.
+                    </p>
+                    <span className="inline-flex items-center gap-2 font-semibold text-primary group-hover:gap-3 transition-all">
+                      Learn more
+                      <ArrowRight className="w-4 h-4" />
+                    </span>
+                  </div>
+                </div>
+              </a>
+            </Link>
+          </motion.div>
         </div>
       </section>
 

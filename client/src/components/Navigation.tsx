@@ -8,7 +8,8 @@ import { motion, AnimatePresence } from "framer-motion";
 export function Navigation() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [, setLocation] = useLocation();
+  const [location] = useLocation();
+  const isHome = location === "/";
 
   useEffect(() => {
     const handleScroll = () => {
@@ -20,8 +21,10 @@ export function Navigation() {
 
   const scrollToSection = (id: string) => {
     setMobileMenuOpen(false);
-    // If not on home page, navigate home first (though this is a single page app)
-    // then scroll
+    if (!isHome) {
+      window.location.assign(`/#${id}`);
+      return;
+    }
     const element = document.getElementById(id);
     if (element) {
       element.scrollIntoView({ behavior: "smooth" });
@@ -32,6 +35,7 @@ export function Navigation() {
     { name: "Services", id: "services" },
     { name: "About", id: "about" },
     { name: "Industries", id: "industries" },
+    { name: "OpsQMS", path: "/opsqms" },
   ];
 
   return (
@@ -43,24 +47,48 @@ export function Navigation() {
       }`}
     >
       <div className="container mx-auto px-4 md:px-6 flex items-center justify-between">
-        <div className="flex items-center gap-3 cursor-pointer" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>
-          <img src={logoImg} alt="Sendire Logo" className="h-10 w-auto rounded-md" />
-          <span className={`text-xl font-bold font-display tracking-tight ${isScrolled ? 'text-secondary' : 'text-secondary'}`}>
-            Sendire
-          </span>
-        </div>
+        {isHome ? (
+          <button
+            type="button"
+            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+            className="flex items-center gap-3 cursor-pointer"
+          >
+            <img src={logoImg} alt="Sendire Logo" className="h-10 w-auto rounded-md" />
+            <span className="text-xl font-bold font-display tracking-tight text-secondary">
+              Sendire
+            </span>
+          </button>
+        ) : (
+          <Link href="/" className="flex items-center gap-3">
+            <img src={logoImg} alt="Sendire Logo" className="h-10 w-auto rounded-md" />
+            <span className="text-xl font-bold font-display tracking-tight text-secondary">
+              Sendire
+            </span>
+          </Link>
+        )}
 
         {/* Desktop Nav */}
         <div className="hidden md:flex items-center gap-8">
-          {navLinks.map((link) => (
-            <button
-              key={link.name}
-              onClick={() => scrollToSection(link.id)}
-              className="text-sm font-medium text-secondary/80 hover:text-primary transition-colors"
-            >
-              {link.name}
-            </button>
-          ))}
+          {navLinks.map((link) =>
+            "path" in link ? (
+              <Link
+                key={link.name}
+                href={link.path}
+                className="text-sm font-medium text-secondary/80 hover:text-primary transition-colors"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                {link.name}
+              </Link>
+            ) : (
+              <button
+                key={link.name}
+                onClick={() => scrollToSection(link.id)}
+                className="text-sm font-medium text-secondary/80 hover:text-primary transition-colors"
+              >
+                {link.name}
+              </button>
+            )
+          )}
           <Button 
             onClick={() => scrollToSection("contact")}
             className="bg-primary hover:bg-primary/90 text-white rounded-full px-6"
@@ -88,15 +116,26 @@ export function Navigation() {
             className="md:hidden bg-white border-b border-border absolute w-full"
           >
             <div className="flex flex-col p-4 space-y-4">
-              {navLinks.map((link) => (
-                <button
-                  key={link.name}
-                  onClick={() => scrollToSection(link.id)}
-                  className="text-left py-2 font-medium text-secondary hover:text-primary"
-                >
-                  {link.name}
-                </button>
-              ))}
+              {navLinks.map((link) =>
+                "path" in link ? (
+                  <Link
+                    key={link.name}
+                    href={link.path}
+                    className="text-left py-2 font-medium text-secondary hover:text-primary"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    {link.name}
+                  </Link>
+                ) : (
+                  <button
+                    key={link.name}
+                    onClick={() => scrollToSection(link.id)}
+                    className="text-left py-2 font-medium text-secondary hover:text-primary"
+                  >
+                    {link.name}
+                  </button>
+                )
+              )}
               <Button onClick={() => scrollToSection("contact")} className="w-full">
                 Contact Us
               </Button>

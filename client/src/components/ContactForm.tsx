@@ -30,20 +30,43 @@ export function ContactForm() {
     },
   });
 
-  const onSubmit = (data: ContactFormData) => {
-    // Simple client-side only - just show success message
-    // In a real scenario, you could use mailto: or integrate with an email service
+  const onSubmit = async (data: ContactFormData) => {
     setIsSubmitted(true);
-    toast({
-      title: "Message Sent",
-      description: "Thank you for reaching out. We'll be in touch shortly.",
-    });
-    
-    // Reset form after a moment
-    setTimeout(() => {
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: data.name,
+          email: data.email,
+          message: data.message,
+        }),
+      });
+      const json = await res.json().catch(() => ({}));
+
+      if (!res.ok) {
+        toast({
+          title: "Couldn't send message",
+          description: json.message || "Please try again later.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      toast({
+        title: "Message sent",
+        description: "Thank you for reaching out. We'll be in touch shortly.",
+      });
       form.reset();
+    } catch {
+      toast({
+        title: "Error",
+        description: "Something went wrong. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
       setIsSubmitted(false);
-    }, 3000);
+    }
   };
 
   return (
